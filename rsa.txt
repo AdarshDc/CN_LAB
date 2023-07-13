@@ -1,0 +1,42 @@
+//rsa
+package CN;
+
+import java.util.*;
+import java.math.BigInteger;
+	public class RSA 
+	{
+		public static void main(String[] args) throws Exception
+		{
+			Random rand1=new Random(System.currentTimeMillis());
+			Random rand2=new Random(System.currentTimeMillis()*10);
+			Scanner sc=new Scanner(System.in);
+			System.out.println("Enter the value of e");
+			int e=sc.nextInt();
+			BigInteger p=BigInteger.probablePrime(32, rand1);
+			BigInteger q=BigInteger.probablePrime(32, rand2);
+			BigInteger n=p.multiply(q);
+			BigInteger p1=p.subtract(new BigInteger("1"));
+			BigInteger q1=q.subtract(new BigInteger("1"));
+			BigInteger phai=p1.multiply(q1);
+			while(true)
+			{
+				BigInteger GCD=phai.gcd(new BigInteger(""+e));
+				if(GCD.equals(BigInteger.ONE))
+				{
+					break;
+				}
+				e++;
+			}
+			BigInteger publickey_e=new BigInteger(""+e);
+			BigInteger prvkey_d=publickey_e.modInverse(phai);
+			System.out.println("public key : "+publickey_e+" , "+n);
+			System.out.println("private key : "+prvkey_d+" , "+n);
+			System.out.println("\nEnter the plain text");
+			int asciiVal=sc.nextInt();
+			BigInteger msg=new BigInteger(""+asciiVal);
+			BigInteger encrypted_msg=msg.modPow(publickey_e,n);
+			System.out.println("Encrpted text: " + encrypted_msg);
+			BigInteger decrypted=encrypted_msg.modPow(prvkey_d,n);
+			System.out.println("Decrypted text:" + decrypted);
+		}
+}

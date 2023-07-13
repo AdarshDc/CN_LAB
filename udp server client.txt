@@ -1,0 +1,54 @@
+//udp server
+package CN;
+
+import java.net.*;
+import java.util.Scanner;
+public class UDPServer
+	{
+	public static void main(String[] args) throws Exception
+	{
+		DatagramSocket skt=new DatagramSocket(6788);
+		byte[] buffer=new byte[1024];
+		while(true)
+		{
+			System.out.println("Server Waiting for the client");
+			DatagramPacket request = new DatagramPacket(buffer,buffer.length);
+			skt.receive(request);
+			String message=new String(request.getData());
+			System.out.println(message);
+			System.out.println("Now you are in server side.... enter the message");
+			Scanner sc=new Scanner(System.in);
+			String str=sc.nextLine();
+			byte[] b=str.getBytes();
+			request = new DatagramPacket(b,b.length,request.getAddress(),request.getPort());
+			skt.send(request);
+		}
+	}
+}
+
+//udp client
+package CN;
+
+import java.net.*;
+public class UDPClient
+{
+	public static void main(String[] args) throws Exception
+	{
+		DatagramSocket clientsocket= new
+				DatagramSocket(6789);
+		byte[] buffer =new byte[100];
+		int serversocket=6788;
+		InetAddress host=InetAddress.getByName("127.0.0.1");
+		String msg="CLIENT TO SERVER: Send the message from the user......";
+		buffer=msg.getBytes();
+		DatagramPacket reply= new DatagramPacket(buffer,buffer.length,host,serversocket);
+		clientsocket.send(reply);
+		byte[] b=new byte[100];
+		DatagramPacket request=new
+		DatagramPacket(b,b.length);
+		clientsocket.receive(request);
+		String str=new String(request.getData());
+		System.out.println("MESSAGE typed at the server "+str);
+		clientsocket.close();
+	}
+}

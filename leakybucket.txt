@@ -1,0 +1,55 @@
+//leakybucket
+package CN;
+
+import java.io.*;
+import java.util.Random;
+import java.util.Scanner;
+public class leakybucket {
+	
+	
+	int bucketsize=50,oprate=10,numpackets;
+	void queue()
+	{
+	Random r1=new Random();
+	Thread t=new Thread();
+	Scanner sc=new Scanner(System.in);
+	System.out.println("Enter the number of packets");
+	numpackets=sc.nextInt();
+	int packets[]=new int[numpackets];
+	System.out.println(" number of packets at the front end of the q "+numpackets);
+	for(int i=0;i<numpackets;i++)
+	{
+	packets[i]=r1.nextInt(80);
+	if(packets[i]>bucketsize)
+	System.out.println("Packet "+i+": packet size="+packets[i]+" bucketoverflows");
+	else
+	{
+	System.out.println("Packet "+i+": Packet size="+packets[i]);
+	if(packets[i]<=10)
+	System.out.println("\t"+packets[i]+ " bytes sent out");
+	else
+	{
+	while(packets[i]>oprate)
+	{
+	System.out.println("\t"+oprate+" bytes sent out");
+	packets[i]=packets[i]-oprate;
+	try
+	{
+	t.sleep(1000);
+	}
+	catch(Exception e){}
+	}
+	if(packets[i]>0)
+	System.out.println("\tLast "+packets[i]+" bytes sent out");
+	}
+	}
+	}
+	}
+	public static void main(String args[]) throws Exception
+	{
+	leakybucket l=new leakybucket();
+	l.queue();
+	}
+	}
+
+

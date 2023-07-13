@@ -1,0 +1,116 @@
+//tcp server
+package CN;
+
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+public class tcpserver
+{
+	public static void main(String args[])throws Exception
+	{
+		while(true)
+		{
+			//create server socket on port 5000
+			ServerSocket ss=new ServerSocket(5000);
+			System.out.println ("Waiting for request");
+			Socket s=ss.accept();
+			System.out.println ("Connected With "+s.getInetAddress().toString());
+			DataInputStream din=new DataInputStream(s.getInputStream());
+			DataOutputStream dout=new DataOutputStream(s.getOutputStream());
+			try
+			{
+				String filename="";
+				filename=din.readUTF();
+				filename="client_"+filename;
+				System.out.println("Sending File: "+filename);
+				dout.writeUTF(filename);
+				dout.flush();
+				File f=new File(filename);
+				FileInputStream fin=new FileInputStream(f);
+				//long sz=(int)f.length();
+				byte b[]=new byte [1024];
+				int read;
+				//System.out.println ("Size: "+sz);
+				//System.out.println ("Buf size: "+ss.getReceiveBufferSize());
+				while((read = fin.read(b)) != -1)
+				{
+					dout.write(b, 0, read);
+					dout.flush();
+				}
+				fin.close();
+				//System.out.println("..ok");
+				//dout.flush();
+				//dout.writeUTF("stop");
+				//System.out.println("Send Complete");
+				//dout.flush();
+			}
+			catch(FileNotFoundException e)
+			{
+				String str="File not found";
+				dout.writeUTF(str);
+				dout.flush();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				System.out.println("An error occured");
+			}
+			din.close();
+			s.close();
+			ss.close();
+		}
+	}
+}
+
+
+
+//tcp client
+package CN;
+import java.io.*;
+import java.util.Scanner;
+import java.net.*;
+public class tcpclient {
+public static void main(String args[])throws Exception
+{
+	String address = "", filename="", str="";
+	Scanner sc=new Scanner(System.in);
+	System.out.println("Enter Server Address: ");
+	address=sc.nextLine();
+	Socket s=new Socket(address,5000);
+	DataInputStream din=new DataInputStream(s.getInputStream());
+	DataOutputStream dout=new DataOutputStream(s.getOutputStream());
+	BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+	System.out.println("Enter File Name: ");
+	filename=sc.nextLine();
+	sc.close();
+	try
+	{
+		dout.writeUTF(filename);
+		dout.flush();
+		//filename="client"+filename;
+		//System.out.println("Saving as file: "+filename);
+		//long sz=Long.parseLong(din.readUTF());
+		//System.out.println ("File Size: "+(sz/(1024*1024))+" MB");
+		byte b[]=new byte [1024];
+		System.out.println("Receving file name");
+		filename=din.readUTF();
+		System.out.println("test:"+filename);
+		FileOutputStream fos=new FileOutputStream(new File(filename),true);
+		long bytesRead;
+		do
+		{
+			bytesRead = din.read(b, 0, b.length);
+			fos.write(b,0,b.length);
+		}
+		while(!(bytesRead<1024));
+		System.out.println("Comleted");
+		fos.close();
+		dout.close();
+		s.close();
+	}
+		catch(EOFException e) 
+		{
+		//do nothing }}
+		}
+	}
+}

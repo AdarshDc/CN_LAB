@@ -1,0 +1,76 @@
+//crc
+package CN;
+
+import java.io.*;
+import java.util.Scanner;
+public class CRC
+{
+static int a,e,c;
+static int N;
+static char t[]=new char[128],cs[]=new char[128];
+static char g[];
+public static void main(String args[]) throws IOException
+{
+String Poly="10001000000100001";
+N=Poly.length();
+g=Poly.toCharArray();
+Scanner sc=new Scanner(System.in);
+System.out.print("Enter message to be transmitted : ");
+String msg=sc.next();
+a=msg.length();
+char temp[]=msg.toCharArray();
+for(int i=0;i<temp.length;i++)
+t[i]=temp[i];
+System.out.println("Generated Polynomial is :"+Poly);
+for(e=a;e<a+N-1;e++)
+t[e]='0';
+System.out.print("Modified message is :");
+for(int i=0;i<t.length;i++)
+System.out.print(t[i]);
+crc();
+System.out.println();
+System.out.print("Checksum is :");
+for(int i=0;i<cs.length;i++)
+System.out.print(cs[i]);
+for(e=a;e<a+N-1;e++)
+t[e]=cs[e-a];
+System.out.println();
+System.out.print("Final Codeword is :");
+for(int i=0;i<t.length;i++)
+System.out.print(t[i]);
+System.out.println();
+System.out.println("Test Error detection:");
+System.out.println("Press : 0 OR 1 (0 - for inserting the error at the specified location and 1 - for not inserting the error)");
+e=sc.nextInt();
+if(e==0)
+{
+System.out.println("Enter position where error is to inserted :");
+e=sc.nextInt();
+t[e]=(t[e]=='0')?'1':'0';
+System.out.print("Errorneous data :");
+for(int i=0;i<t.length;i++)
+System.out.print(t[i]);
+}
+System.out.println();
+crc();
+for (e=0;(e<N-1)&&(cs[e]!='1');e++);
+if(e<N-1)
+System.out.println("Error detected");
+else
+System.out.println("No Error Detected");
+}
+static void xor()
+{
+for(c=1;c<N;c++) cs[c]=((cs[c]==g[c])?'0':'1');
+}
+static void crc()
+{
+for(e=0;e<N;e++) cs[e]=t[e];
+do
+{
+if(cs[0]=='1') xor();
+for(c=0;c<N-1;c++) cs[c]=cs[c+1];
+cs[c]=t[e++];
+}while(e<=a+N-1);
+}
+}
